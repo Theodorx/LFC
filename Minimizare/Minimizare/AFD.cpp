@@ -48,6 +48,36 @@ AFD AFD::CitireDinFisier(const std::string& Fisier)
 
 }
 
+void AFD::ScrieInFisier(const std::string& Fisier)
+{
+	std::ofstream myFile;
+	myFile.open(Fisier);
+	myFile.clear();
+	myFile << "Stari: ";
+	for (int i = 0; i < m_stari.size(); i++)
+		myFile << m_stari[i] << " ";
+	myFile << std::endl;
+
+	myFile << "Sigma: ";
+	for (int i = 0; i < m_sigma.size(); i++)
+		myFile << m_sigma[i] << " ";
+	myFile << std::endl;
+
+	myFile << "Delta: ";
+	for (int i = 0; i < m_delta.size(); i++)
+		myFile << "\n" << std::get<0>(m_delta[i]) << " " << std::get<1>(m_delta[i]) << " " << std::get<2>(m_delta[i]);
+	myFile << std::endl;
+
+	myFile << "Stare Initiala: " << m_stareInit << "\n";
+	myFile << "Stari Finale: ";
+	for (int i = 0; i < m_stariFinale.size(); i++)
+		myFile << m_stariFinale[i] << " ";
+	myFile << std::endl;
+	myFile.close();
+}
+
+
+
 void AFD::Afisare()
 {
 	std::cout << "Stari: ";
@@ -198,7 +228,6 @@ void AFD::Minimizare()
 				
 			}		
 	}
-	std::cout << "mama";
 	std::vector<std::pair<int,int>> stariNemarcate;
 	for(int i=0;i<tabel.size();i++)
 		for (int j = 0; j < tabel[i].size()-1; j++)
@@ -251,6 +280,24 @@ void AFD::Minimizare()
 			
 		}
 
+		//m_stariFinale
+		for (int j = 0; j <m_stariFinale.size(); j++)
+			if ((m_stariFinale[j] == m_stari[stariNemarcate[i].first]) || (m_stariFinale[j] == m_stari[stariNemarcate[i].second]))
+			{
+				m_stariFinale[j][0] = 'P';
+			}
+		for (int j = 0; j < m_stariFinale.size(); j++)
+			if (m_stariFinale[j][0] == 'P')
+			{
+				ramaneOStare = m_stariFinale[j];
+				break;
+			}
+		for (int j = 0; j < m_stariFinale.size(); j++)
+			if (m_stariFinale[j][0] == 'P')
+			{
+				m_stariFinale[j] = ramaneOStare;
+			}
+
 		//m_stari
 		for (int j = 0; j < m_stari.size(); j++)
 			if ((m_stari[j] == m_stari[stariNemarcate[i].first]) || (m_stari[j] == m_stari[stariNemarcate[i].second]))
@@ -269,6 +316,7 @@ void AFD::Minimizare()
 			{
 				m_stari[j]=ramaneOStare;
 			}
+		//
 		//Schimbam litera ca sa mearga si la urmatoarele parcurgeri
 		for (int j = 0; j < m_stari.size(); j++)
 			if (m_stari[j][0] == 'P')
@@ -280,6 +328,9 @@ void AFD::Minimizare()
 			if (std::get<2>(m_delta[j])[0] == 'P')
 				std::get<2>(m_delta[j])[0] = 'A';
 		}
+		for (int j = 0; j < m_stariFinale.size(); j++)
+			if (m_stariFinale[j][0] == 'P')
+				m_stariFinale[j][0] = 'A';
 
 	}
 	for(int i=0;i<m_stari.size()-1;i++)
@@ -294,7 +345,22 @@ void AFD::Minimizare()
 			if (m_delta[i] == m_delta[j] && i != j)
 				m_delta.erase(m_delta.begin() + j);
 		}
-
+	for (int i = 0; i < m_stariFinale.size() - 1; i++)
+		for (int j = 1; j < m_stariFinale.size(); j++)
+		{
+			if (m_stariFinale[i] == m_stariFinale[j] && i != j)
+				m_stariFinale.erase(m_stariFinale.begin() + j);
+		}
+	for (int i = 0; i < m_delta.size(); i++)
+	{
+		std::get<0>(m_delta[i])[0] = 'P';
+		std::get<2>(m_delta[i])[0] = 'P';
+	}
+	for (int i = 0; i < m_stari.size(); i++)
+		m_stari[i][0] = 'P';
+	for (int i = 0; i < m_stariFinale.size(); i++)
+		m_stariFinale[i][0] = 'P';
+	m_stareInit[0] = 'P';
 }
 
 void AFD::EliminareStariNeaccesibile()
@@ -355,15 +421,14 @@ void AFD::EliminareStariNeaccesibile()
 
 }
 
-void AFD::Menu(AFD UnAFD)
+void AFD::Menu(AFD UnAFD, AFD AltAFD)
 {
 	int Optiune;
 	while (1)
 	{
 		system("CLS");
-		std::cout << "Afd-ul inainte de eliminarea starilor inaccesibile";
 		UnAFD.Afisare();
-		std::cout << "SELECTEAZA UNA DINTRE URMATOARELE OPTIUNI\n1)Verificare Cuvant\n2)Minimizare\n3)Parasire Aplicatie\n";
+		std::cout << "SELECTEAZA UNA DINTRE URMATOARELE OPTIUNI\n1)Verificare Cuvant\n2)Minimizare\n3)Verificare Cuvant cu AFD-ul Minimizat\n4)Parasire Aplicatie\n";
 		std::cin >> Optiune;
 		std::string Cuvant;
 		switch (Optiune)
@@ -377,12 +442,24 @@ void AFD::Menu(AFD UnAFD)
 			system("pause");
 			break;
 		case 2:
-			UnAFD.Minimizare();
+			AltAFD.Minimizare();
+			AltAFD.ScrieInFisier("FisierOut.txt");
+			std::cout << "Afd-ul minimizat a fost scris in fisierul (FisierOut)";
+			system("pause");
 			break;
+		case 3:
+			AltAFD.Minimizare();
+			std::cout << "Introduceti un cuvant\n";
+			std::cin >> Cuvant;
+			Cuvant = AltAFD.VerificareCuvant(Cuvant);
+			std::cout << Cuvant;
+			system("pause");
+			break;
+
 		}
-		if (Optiune == 3)
+		if (Optiune == 4)
 			break;
-		if (Optiune != 1 && Optiune != 2)
+		if (Optiune != 1 && Optiune != 2&&Optiune!=3)
 		{
 			std::cout << "Optiunea nu exista! Introduceti o optiune valida";
 			system("pause");

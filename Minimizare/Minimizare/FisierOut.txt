@@ -1,0 +1,14 @@
+Stari: P0 P1 P2 P3 P5 
+Sigma: a b 
+Delta: 
+P0 a P1
+P0 b P3
+P1 a P2
+P2 b P2
+P2 a P3
+P3 b P3
+P3 a P5
+P5 a P5
+P5 b P5
+Stare Initiala: P0
+Stari Finale: P5 

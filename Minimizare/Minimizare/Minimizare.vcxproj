@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Automat finit File.txt" />
+    <Text Include="FisierOut.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

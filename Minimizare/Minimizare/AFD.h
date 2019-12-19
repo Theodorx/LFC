@@ -25,7 +25,8 @@ public:
 
 	}
 	AFD CitireDinFisier(const std::string& Fisier);
-	void Menu(AFD UnAFD);
+	void ScrieInFisier(const std::string& Fisier);
+	void Menu(AFD UnAFD, AFD AltAFD);
 	void EliminareStariNeaccesibile();
 	
 

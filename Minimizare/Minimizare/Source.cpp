@@ -5,7 +5,7 @@ int main()
 	AFD UnAFD = UnAFD.CitireDinFisier("Automat finit File.txt");
 	AFD AltAFD = AltAFD.CitireDinFisier("Automat finit File.txt");
 	AltAFD.EliminareStariNeaccesibile();
-	UnAFD.Menu(AltAFD);
+	UnAFD.Menu(UnAFD,AltAFD);
 	return 0;
 
 }
